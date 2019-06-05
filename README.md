@@ -25,7 +25,9 @@ make
 ```
 
 ## Documentation for RHE-mc
+An executable file named RHEmc will be in build folder after the installation steps. Run RHE-mc as follows:
  ```
+ ./RHEmc <command_line arguments>
 
 ### Parameters
 
