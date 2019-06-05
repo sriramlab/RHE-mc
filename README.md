@@ -11,7 +11,7 @@ cmake
 make
 ```
 
-## Installing
+## How to install :
 
 ```
 git clone https://github.com/alipazokit/RHE-mc.git
