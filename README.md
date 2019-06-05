@@ -28,6 +28,17 @@ An executable file named RHEmc will be in build folder after the installation st
 ```
 ## Parameters
 
+```
+genotype (-g) : The path of a text file which contains pathes of genotypes files.
+phenotype (-p): The path of phenotype file
+covariate (-c): The path of covariate file
+annotation (-annot): The path of annotation file.
+num_vec (-k) : The number of random vectors (10 is recommended)
+num_block (-jn): The number of jackknife blocks. (100 is recommended)
+out_put (-o): The path of output file.
+
+```
+
 
 
 
