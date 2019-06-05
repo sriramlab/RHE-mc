@@ -17,6 +17,10 @@ make
 
 ### Installing
 
+git clone https://github.com/alipazokit/RHE-mc.git
+cd RHE-mc
+cmake ..
+make
 ```
 
 ## Documentation for RHE-mc
