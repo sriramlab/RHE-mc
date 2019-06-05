@@ -17,6 +17,7 @@ make
 git clone https://github.com/alipazokit/RHE-mc.git
 cd RHE-mc
 mkdir build
+cd build/
 cmake ..
 make
 ```
