@@ -39,7 +39,7 @@ out_put (-o): The path of output file.
 
 ```
 ## Toy example 
-To make sure that everything works, sample files are provided in example directory. Run RHE-mc as follows from example directory.
+To make sure that everything works well, sample files are provided in example directory. Run RHE-mc as follows:
 ```
 ../build/RHEmc -g adr.txt -c sample.cov -p sample.pheno.plink -k 10 -jn 22  -o out.txt -annot sample.annot.txt
 ```
