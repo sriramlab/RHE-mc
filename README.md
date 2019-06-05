@@ -38,6 +38,11 @@ num_block (-jn): The number of jackknife blocks. (100 is recommended)
 out_put (-o): The path of output file.
 
 ```
+## Toy example 
+
+```
+./RHEmc -g ../example/adr.txt -c ../example/sample.cov -p ../example/sample.pheno.plink -k 10 -jn 22  -o out.txt -annot ../example/sample.annot.txt
+```
 
 
 
