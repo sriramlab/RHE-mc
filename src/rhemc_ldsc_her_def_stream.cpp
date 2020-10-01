@@ -2421,8 +2421,8 @@ for(int i=0;i<Nsnp;i++){
 MatrixXdr se_her_cat_ldsc=jack_se(her_cat_ldsc);
 //cout<<se_her_cat_ldsc<<endl;
 
-cout<<endl<<"h^2's (heritabilities) and e's (enrichments) are computed based on Equation (9) in the paper  https://doi.org/10.1038/s41467-020-17576-9):"<<endl;
-outfile<<endl<<"h^2's (heritabilities) and e's (enrichments) are computed based on Equation (9) in the paper  https://doi.org/10.1038/s41467-020-17576-9):"<<endl;
+cout<<endl<<"h^2's (heritabilities) and e's (enrichments) are computed based on Equation 9 (overlapping setting) in the paper  https://doi.org/10.1038/s41467-020-17576-9:"<<endl;
+outfile<<endl<<"h^2's (heritabilities) and e's (enrichments) are computed based on Equation 9 (overlapping setting) in the paper  https://doi.org/10.1038/s41467-020-17576-9:"<<endl;
 
 cout<<endl<<"h^2's: "<<endl;
 outfile<<"h^2's: "<<endl;
@@ -2549,8 +2549,8 @@ for (int i=0;i<Nbin;i++){
     enrich_SEjack(i,0)=sqrt(enrich_SEjack(i,0));
 }
 */
-cout<<endl<<"h^2's (heritabilities) and e's (enrichments) are computed based on Equation (2-4) in the paper  https://doi.org/10.1038/s41467-020-17576-9):"<<endl;
-outfile<<endl<<"h^2's (heritabilities) and e's (enrichments) are computed based on Equation (2-4) in the paper  https://doi.org/10.1038/s41467-020-17576-9):"<<endl;
+cout<<endl<<"h^2's (heritabilities) and e's (enrichments) are computed based on Equations 2-4 (non-overlapping setting) in the paper  https://doi.org/10.1038/s41467-020-17576-9:"<<endl;
+outfile<<endl<<"h^2's (heritabilities) and e's (enrichments) are computed based on Equations 2-4 (non-overlapping setting) in the paper  https://doi.org/10.1038/s41467-020-17576-9:"<<endl;
 
 cout<<endl<<"h^2's: "<<endl;
 outfile<<"h^2's: "<<endl;
