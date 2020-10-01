@@ -15,4 +15,4 @@ IF (NOT DEFINED DEBUG)
 ENDIF()
 ADD_DEFINITIONS(-DDEBUG=${DEBUG})
 
-add_executable(RHEmc src/RHEmc.cpp src/genotype.cpp src/storage.cpp)
+add_executable(RHEmc src/rhemc_ldsc_her_def_stream.cpp src/genotype.cpp src/storage.cpp)
