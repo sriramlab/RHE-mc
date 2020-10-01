@@ -47,9 +47,11 @@ Phenotype: It must have a header in the following format: FID IID name_of_phenot
 Covariate: It must have a header in the following format: FID IID name_of_cov_1 name_of_cov_2  . . .   name_of_cov_n
 Annotation: It has M rows (M=number  of SNPs) and K columns (K=number of annotations). If SNP i belongs to annotation j, then there is  "1" in row i and column j. Otherwise there is "0". (delimiter is " ")
 
-1) Order of individuals must be same in phenotype, gentype and covariate files.
-2) Order of SNPs must be same in bim file and annotation file.
-3) Annotation file does not have a header.
+1) Number and order of individuals must be same in phenotype, gentype and covariate files.
+2) Number and order of SNPs must be same in bim file and annotation file.
+3) Annotation file does not have a header. The code supports overlapping annotations (e.g : functional annotation)
+4) SNPs with MAF=0 must be excluded from the genotype file.
+5) RHE-mc excludes individuals with NA values in the phenotype file from the analysis.
 ```
 ## Toy example 
 To make sure that everything works well, sample files are provided in example directory. Look at test.sh file and run it  :
