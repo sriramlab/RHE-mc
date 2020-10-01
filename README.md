@@ -54,6 +54,8 @@ Annotation: It has M rows (M=number  of SNPs) and K columns (K=number of annotat
 ## Toy example 
 To make sure that everything works well, sample files are provided in example directory. Look at test.sh file and run it  :
 ```
+chmod +x test.sh
+./test.sh
 ```
 
 
