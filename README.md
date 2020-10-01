@@ -34,8 +34,8 @@ genotype (-g) : The path of  genotype file
 phenotype (-p): The path of phenotype file
 covariate (-c): The path of covariate file
 annotation (-annot): The path of annotation file.
-num_vec (-k) : The number of random vectors (10 is recommended)
-num_block (-jn): The number of jackknife blocks. (100 is recommended). The higher number of jackknife blocks the higher memory usage.
+num_vec (-k) : The number of random vectors (10 is recommended). 
+num_block (-jn): The number of jackknife blocks. (100 or 22 are recommended). The higher number of jackknife blocks the higher memory usage.
 out_put (-o): The path of output file.
 memory efficent mode (-mem): The flag states whether to use a memory effecient version of code. The memory efficient version is a little slower  than the not efficient version (default: false)
 
