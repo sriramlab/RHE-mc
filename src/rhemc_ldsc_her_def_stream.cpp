@@ -2492,6 +2492,9 @@ for (int i=0;i<real_Njack;i++){
         total_size+=(len[j]-jack_bin[i][j]);
     } */
 
+    step_size=Nsnp/real_Njack;
+    step_size_rem=Nsnp%real_Njack;
+	
    int num_snp_in_jack=(i<(real_Njack-1)) ? (step_size) : (step_size+step_size_rem);
    total_size=Nsnp-num_snp_in_jack;
    for (int j=0;j<Nbin;j++){
