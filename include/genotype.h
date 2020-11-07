@@ -22,6 +22,7 @@ class genotype {
         std::vector<double> columnmeans;
         std::vector<double> columnmeans2;
 
+	int index;
 
 	bool read_header;
 		unsigned char mask;
