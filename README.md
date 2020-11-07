@@ -27,6 +27,12 @@ An executable file named RHEmc will be in build folder after the installation st
  ```
  ./RHEmc <command_line arguments>
 ```
+To estimate dominance heritability and additve heritability jointly run :
+
+```
+ ./RHEmc_dom <command_line arguments>
+```
+
 ## Parameters
 
 ```
