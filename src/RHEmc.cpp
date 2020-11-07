@@ -1,7 +1,4 @@
-/** 
- All of this code is written by Aman Agrawal 
- (Indian Institute of Technology, Delhi)
-*/
+
 #include <fstream>
 #include <iostream>
 #include <string>

@@ -31,7 +31,7 @@ struct options{
 	bool fast_mode;
 	bool missing;
 	bool text_version;
-	
+	double beta;
 };
 
 template<typename T, typename U>
@@ -285,6 +285,11 @@ void parse_args(int argc, char const *argv[]){
                                 command_line_opts.jack_number= atoi(argv[i+1]);
                                 i++;
                         }
+		        else if(strcmp(argv[i],"-h2")==0){
+                                command_line_opts.beta= atof(argv[i+1]);
+                                i++;
+                        }
+
 			else if(strcmp(argv[i],"-aem")==0){
 				command_line_opts.accelerated_em = atof(argv[i+1]);
 				i++;
