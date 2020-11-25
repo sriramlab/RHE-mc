@@ -1,61 +1,122 @@
 OUTPUT: 
 Variances: 
-Sigma^2_0: -0.000424276
-Sigma^2_1: 0.0119635
-Sigma^2_2: 0.0156663
-Sigma^2_3: 0.170542
-Sigma^2_4: 0.0308082
-Sigma^2_5: 0.160744
-Sigma^2_6: 0.0737855
-Sigma^2_7: 0.0489137
-Sigma^2_e: 0.474841
+Sigma^2_0: 0.0120512
+Sigma^2_1: 0.0690855
+Sigma^2_2: 0.00835383
+Sigma^2_3: 0.0914112
+Sigma^2_4: 0.0114851
+Sigma^2_5: 0.000669199
+Sigma^2_6: 0.064733
+Sigma^2_7: -0.000887397
+Sigma^2_e: 0.449233
 
-h^2's (heritabilities) and e's (enrichments) are computed based on Equation (9) in the paper  https://doi.org/10.1038/s41467-020-17576-9):
+h^2's (heritabilities) and e's (enrichments) are computed based on Equation 9 (overlapping setting) in the paper  https://doi.org/10.1038/s41467-020-17576-9:
 h^2's: 
-h^2 of bin 0 : -0.000429934 ,  se: 0.00204184
-h^2 of bin 1 : 0.012123 ,  se: 0.0171806
-h^2 of bin 2 : 0.0158752 ,  se: 0.00665863
-h^2 of bin 3 : 0.172817 ,  se: 0.0258471
-h^2 of bin 4 : 0.031219 ,  se: 0.0138525
-h^2 of bin 5 : 0.162888 ,  se: 0.0170622
-h^2 of bin 6 : 0.0747694 ,  se: 0.0109028
-h^2 of bin 7 : 0.049566 ,  se: 0.00957063
+h^2 of bin 0 : 0.0170665 ,  se: 0.0237199
+h^2 of bin 1 : 0.0978361 ,  se: 0.0445445
+h^2 of bin 2 : 0.0118304 ,  se: 0.0161818
+h^2 of bin 3 : 0.129453 ,  se: 0.0625915
+h^2 of bin 4 : 0.0162648 ,  se: 0.022659
+h^2 of bin 5 : 0.000947692 ,  se: 0.020735
+h^2 of bin 6 : 0.0916723 ,  se: 0.0764137
+h^2 of bin 7 : -0.00125669 ,  se: 0.0104165
 h^2_i/h^2_t: 
-h^2/h^2_t of bin 0 : -0.000828666,  se: 0.00395328
-h^2/h^2_t of bin 1 : 0.0233662,  se: 0.0335315
-h^2/h^2_t of bin 2 : 0.0305983,  se: 0.0126839
-h^2/h^2_t of bin 3 : 0.333091,  se: 0.039376
-h^2/h^2_t of bin 4 : 0.0601723,  se: 0.0256178
-h^2/h^2_t of bin 5 : 0.313954,  se: 0.03481
-h^2/h^2_t of bin 6 : 0.144112,  se: 0.0183847
-h^2/h^2_t of bin 7 : 0.0955347,  se: 0.0159969
+h^2/h^2_t of bin 0 : 0.0469099,  se: 0.0689261
+h^2/h^2_t of bin 1 : 0.268918,  se: 0.131565
+h^2/h^2_t of bin 2 : 0.0325176,  se: 0.0458377
+h^2/h^2_t of bin 3 : 0.355822,  se: 0.157929
+h^2/h^2_t of bin 4 : 0.0447064,  se: 0.0620757
+h^2/h^2_t of bin 5 : 0.00260488,  se: 0.0578907
+h^2/h^2_t of bin 6 : 0.251976,  se: 0.189826
+h^2/h^2_t of bin 7 : -0.00345423,  se: 0.0290166
 Enrichments: 
-Enrichment of bin 0 : -0.032067,  se: 0.152981
-Enrichment of bin 1 : 0.104216,  se: 0.149555
-Enrichment of bin 2 : 0.652515,  se: 0.270488
-Enrichment of bin 3 : 1.64011,  se: 0.193884
-Enrichment of bin 4 : 0.531158,  se: 0.226136
-Enrichment of bin 5 : 2.2967,  se: 0.254649
-Enrichment of bin 6 : 0.691227,  se: 0.0881812
-Enrichment of bin 7 : 2.30231,  se: 0.385513
+Enrichment of bin 0 : 1.56366,  se: 2.29754
+Enrichment of bin 1 : 1.28056,  se: 0.626499
+Enrichment of bin 2 : 0.40647,  se: 0.572971
+Enrichment of bin 3 : 2.22388,  se: 0.987059
+Enrichment of bin 4 : 0.372553,  se: 0.517298
+Enrichment of bin 5 : 0.0372126,  se: 0.82701
+Enrichment of bin 6 : 0.868882,  se: 0.654574
+Enrichment of bin 7 : -0.0863556,  se: 0.725415
 
-h^2's (heritabilities) and e's (enrichments) are computed based on Equation (2-4) in the paper  https://doi.org/10.1038/s41467-020-17576-9):
+h^2's (heritabilities) and e's (enrichments) are computed based on Equations 2-4 (non-overlapping setting) in the paper  https://doi.org/10.1038/s41467-020-17576-9:
 h^2's: 
-h^2 of bin 0 : -0.000429934,  se: 0.00204184
-h^2 of bin 1 : 0.012123,  se: 0.0171806
-h^2 of bin 2 : 0.0158752,  se: 0.00665863
-h^2 of bin 3 : 0.172817,  se: 0.0258471
-h^2 of bin 4 : 0.031219,  se: 0.0138525
-h^2 of bin 5 : 0.162888,  se: 0.0170622
-h^2 of bin 6 : 0.0747694,  se: 0.0109028
-h^2 of bin 7 : 0.049566,  se: 0.00957063
-Total h^2 : 0.518827, se: 0.0393505
+h^2 of bin 0 : 0.0170665,  se: 0.0237199
+h^2 of bin 1 : 0.0978361,  se: 0.0445445
+h^2 of bin 2 : 0.0118304,  se: 0.0161818
+h^2 of bin 3 : 0.129453,  se: 0.0625915
+h^2 of bin 4 : 0.0162648,  se: 0.022659
+h^2 of bin 5 : 0.000947692,  se: 0.020735
+h^2 of bin 6 : 0.0916723,  se: 0.0764137
+h^2 of bin 7 : -0.00125669,  se: 0.0104165
+Total h^2 : 0.363814, se: 0.120904
 Enrichments: 
-Enrichment of bin 0: -0.032067 ,  se: 0.15223
-Enrichment of bin 1: 0.104216 ,  se: 0.149626
-Enrichment of bin 2: 0.652515 ,  se: 0.271148
-Enrichment of bin 3: 1.64011 ,  se: 0.200971
-Enrichment of bin 4: 0.531158 ,  se: 0.227955
-Enrichment of bin 5: 2.2967 ,  se: 0.27384
-Enrichment of bin 6: 0.691227 ,  se: 0.092795
-Enrichment of bin 7: 2.30231 ,  se: 0.419787
+Enrichment of bin 0: 1.56366 ,  se: 3.00797
+Enrichment of bin 1: 1.28056 ,  se: 0.582924
+Enrichment of bin 2: 0.40647 ,  se: 0.617227
+Enrichment of bin 3: 2.22388 ,  se: 0.923151
+Enrichment of bin 4: 0.372553 ,  se: 0.543962
+Enrichment of bin 5: 0.0372126 ,  se: 0.951329
+Enrichment of bin 6: 0.868882 ,  se: 0.647058
+Enrichment of bin 7: -0.0863556 ,  se: 0.922626
+OUTPUT: 
+Variances: 
+Sigma^2_0: 0.0131515
+Sigma^2_1: 0.0724839
+Sigma^2_2: 0.00685822
+Sigma^2_3: 0.0679613
+Sigma^2_4: 0.0148608
+Sigma^2_5: -0.00306453
+Sigma^2_6: 0.0469204
+Sigma^2_7: -0.00331471
+Sigma^2_e: 0.503095
+
+h^2's (heritabilities) and e's (enrichments) are computed based on Equation 9 (overlapping setting) in the paper  https://doi.org/10.1038/s41467-020-17576-9:
+h^2's: 
+h^2 of bin 0 : 0.0182926 ,  se: 0.0253666
+h^2 of bin 1 : 0.100819 ,  se: 0.040583
+h^2 of bin 2 : 0.00953919 ,  se: 0.0136102
+h^2 of bin 3 : 0.0945283 ,  se: 0.0440235
+h^2 of bin 4 : 0.02067 ,  se: 0.0277091
+h^2 of bin 5 : -0.0042625 ,  se: 0.0141505
+h^2 of bin 6 : 0.0652622 ,  se: 0.0571905
+h^2 of bin 7 : -0.00461047 ,  se: 0.0131884
+h^2_i/h^2_t: 
+h^2/h^2_t of bin 0 : 0.0609271,  se: 0.0896736
+h^2/h^2_t of bin 1 : 0.335796,  se: 0.140364
+h^2/h^2_t of bin 2 : 0.0317721,  se: 0.046118
+h^2/h^2_t of bin 3 : 0.314844,  se: 0.147078
+h^2/h^2_t of bin 4 : 0.0688455,  se: 0.0911121
+h^2/h^2_t of bin 5 : -0.0141971,  se: 0.0474279
+h^2/h^2_t of bin 6 : 0.217368,  se: 0.179539
+h^2/h^2_t of bin 7 : -0.015356,  se: 0.0449913
+Enrichments: 
+Enrichment of bin 0 : 2.0309,  se: 2.98912
+Enrichment of bin 1 : 1.59903,  se: 0.668398
+Enrichment of bin 2 : 0.397151,  se: 0.576474
+Enrichment of bin 3 : 1.96778,  se: 0.919235
+Enrichment of bin 4 : 0.573713,  se: 0.759267
+Enrichment of bin 5 : -0.202815,  se: 0.677542
+Enrichment of bin 6 : 0.749545,  se: 0.619098
+Enrichment of bin 7 : -0.383901,  se: 1.12478
+
+h^2's (heritabilities) and e's (enrichments) are computed based on Equations 2-4 (non-overlapping setting) in the paper  https://doi.org/10.1038/s41467-020-17576-9:
+h^2's: 
+h^2 of bin 0 : 0.0182926,  se: 0.0253666
+h^2 of bin 1 : 0.100819,  se: 0.040583
+h^2 of bin 2 : 0.00953919,  se: 0.0136102
+h^2 of bin 3 : 0.0945283,  se: 0.0440235
+h^2 of bin 4 : 0.02067,  se: 0.0277091
+h^2 of bin 5 : -0.0042625,  se: 0.0141505
+h^2 of bin 6 : 0.0652622,  se: 0.0571905
+h^2 of bin 7 : -0.00461047,  se: 0.0131884
+Total h^2 : 0.300238, se: 0.092311
+Enrichments: 
+Enrichment of bin 0: 2.0309 ,  se: 3.72005
+Enrichment of bin 1: 1.59903 ,  se: 0.61896
+Enrichment of bin 2: 0.397151 ,  se: 0.622844
+Enrichment of bin 3: 1.96778 ,  se: 0.856052
+Enrichment of bin 4: 0.573713 ,  se: 0.796727
+Enrichment of bin 5: -0.202815 ,  se: 0.768973
+Enrichment of bin 6: 0.749545 ,  se: 0.614669
+Enrichment of bin 7: -0.383901 ,  se: 1.4283

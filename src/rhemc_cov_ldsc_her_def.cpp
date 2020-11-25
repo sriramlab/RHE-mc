@@ -157,7 +157,7 @@ bool use_1col_annot=false;
 
 
 ///Variables for reg out cov on both side of LM
-bool both_side_cov=false;
+bool both_side_cov=true;
 MatrixXdr UXXz;
 MatrixXdr XXUz;
 MatrixXdr Xz;
@@ -1454,9 +1454,6 @@ return SEjack;
 int main(int argc, char const *argv[]){
  
 
-bool a=1;
-double b=3.1455555;
-cout<<double(a*b)<<endl; 
 
 parse_args(argc,argv);
 ////////////////////////////////////////////
