@@ -910,8 +910,8 @@ void read_annot (string filename){
 	   for(int j=0;j<Nbin;j++)
 		 if (annot_bool[i][j]==1){
 			temp=i/step_size;
-			if (temp==Njack)
-				temp--;
+			if (temp>=Njack)
+				temp=Njack-1;
 			//cout<<i<<"xxx"<<j<<"xxx"<<temp<<endl;
 			jack_bin[temp][j]++;	
 		 }
