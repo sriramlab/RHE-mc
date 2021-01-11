@@ -6,7 +6,7 @@ Randomized Heritability Estimation for Multi-variance Components
 ## Prerequisites
 The following packages are required on a linux machine to compile and use the software package.
 ```
-g++
+g++ (4.4.7)
 cmake
 make
 ```
