@@ -1701,6 +1701,11 @@ ifstream ifs (name.c_str(), ios::in|ios::binary);
 read_header=true;
 global_snp_index=-1;
 
+if (!ifs.is_open()){
+   cerr << "Error reading file "<< name  <<endl;
+    exit(1);
+}
+	
 
 cout<<"Start reading genotypes in blocks"<<endl;
     
