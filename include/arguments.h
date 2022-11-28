@@ -6,7 +6,7 @@
 #include <sstream>
 #include <map>
 #include <fstream>
-#include <bits/stdc++.h>
+//#include <bits/stdc++.h>
 
 using namespace std;
 
@@ -34,6 +34,7 @@ struct options{
 	double beta;
 };
 
+/*
 template<typename T, typename U>
 struct is_same {
     static const bool value = false; 
@@ -43,7 +44,7 @@ template<typename T>
 struct is_same<T,T> { 
    static const bool value = true; 
 };
-
+*/
 
 extern options command_line_opts;
 
@@ -56,6 +57,7 @@ void exitWithError(const std::string &error) {
 	exit(EXIT_FAILURE);
 }
 
+/*
 class Convert{
 public:
 	template <typename T>
@@ -85,8 +87,9 @@ public:
 		return val;
 	}
 };
+*/
 
-
+/*
 class ConfigFile{
 private:
 	std::map<std::string, std::string> contents;
@@ -191,7 +194,7 @@ public:
 		return Convert::string_to_T<ValueType>(contents.find(key)->second);
 	}
 };
-
+*/
 void parse_args(int argc, char const *argv[]){
 	
 	// Setting Default Values
@@ -200,6 +203,8 @@ void parse_args(int argc, char const *argv[]){
 	command_line_opts.debugmode=false;
 	command_line_opts.OUTPUT_PATH = "";
 	bool got_genotype_file=false;
+	bool got_pheno_file=false;
+        bool got_annot_file=false;
 	command_line_opts.l=2;
 	command_line_opts.accelerated_em=0;
 	command_line_opts.memory_efficient=false;
@@ -207,13 +212,12 @@ void parse_args(int argc, char const *argv[]){
 	command_line_opts.missing=false;
 	command_line_opts.text_version = false;
 	
-
-	if(argc<3){
-		cout<<"Correct Usage is "<<argv[0]<<" -p <parameter file>"<<endl;
+	if(argc<1){
+		cout<<"Correct Usage :"<<endl<<" -g  <genotype file> -p <phenotype file> -c <covariate file>  -k <number of random vector> -jn <number of jackknife blocks>    -o <output file> -annot <annot file> "<<endl;
 		exit(-1);
 	}
 
-	if(strcmp(argv[1],"-p")==0){
+/*	if(strcmp(argv[1],"-p")==0){
 
 		std::string cfg_filename = std::string(argv[2]);
 		ConfigFile cfg(cfg_filename);
@@ -233,7 +237,7 @@ void parse_args(int argc, char const *argv[]){
 		command_line_opts.fast_mode = cfg.getValueOfKey<bool>("fast_mode",true);
 		command_line_opts.missing = cfg.getValueOfKey<bool>("missing",false);	
 		command_line_opts.text_version = cfg.getValueOfKey<bool>("text_version",false);							
-	}
+	}*/
 	else{
 		for (int i = 1; i < argc; i++) { 
 		if (i + 1 != argc){
@@ -242,19 +246,15 @@ void parse_args(int argc, char const *argv[]){
 				got_genotype_file=true;
 				i++;
 			}
-			else if(strcmp(argv[i],"-o")==0){
-				command_line_opts.OUTPUT_FILE_PATH = string(argv[i+1]);
-				got_genotype_file=true;
-				i++;
-			}
 			 else if(strcmp(argv[i],"-annot")==0){
                                 command_line_opts.Annot_PATH= string(argv[i+1]);
-                                got_genotype_file=true;
+                                got_annot_file=true;
                                 i++;
                         }
 		
 			else if(strcmp(argv[i], "-p")==0){
 				command_line_opts.PHENOTYPE_FILE_PATH =string(argv[i+1]); 
+				got_pheno_file=true;
 				i++; 
 			}
 			else if(strcmp(argv[i],"-c")==0){
@@ -294,7 +294,7 @@ void parse_args(int argc, char const *argv[]){
 				command_line_opts.accelerated_em = atof(argv[i+1]);
 				i++;
 			}
-			else if(strcmp(argv[i],"-v")==0)
+			/*else if(strcmp(argv[i],"-v")==0)
 				command_line_opts.debugmode=true;
 			else if(strcmp(argv[i],"-a")==0)
 				command_line_opts.getaccuracy=true;
@@ -306,10 +306,10 @@ void parse_args(int argc, char const *argv[]){
 				command_line_opts.fast_mode=false;
 			else if(strcmp(argv[i],"-txt")==0)
 				command_line_opts.text_version=true;
-			
+			*/
 			else{
 				cout<<"Not Enough or Invalid arguments"<<endl;
-				cout<<"Correct Usage is "<<argv[0]<<" -g <genotype file> -k <num_of_evec> -b <num_of_zb/10>  -v (for debugmode) -a (for getting accuracy)"<<endl;
+				cout<<"Correct Usage is "<<argv[0]<<" -g  <genotype file> -p <phenotype file> -c <covariate file>  -k <number of random vector> -jn <number of jackknife blocks>    -o <output file> -annot <annot file>"<<endl;
 				exit(-1);
 			}
 		}
@@ -332,9 +332,9 @@ void parse_args(int argc, char const *argv[]){
 
 	}
 	
-	if(got_genotype_file==false){
-		cout<<"Genotype file missing"<<endl;
-		cout<<"Correct Usage is "<<argv[0]<<" -g <genotype file> -k <num_of_evec> -m <max_iterations> -v (for debugmode) -a (for getting accuracy)"<<endl;
+	if(got_genotype_file==false || got_pheno_file==false || got_annot_file==false){
+		cout<<"file missing"<<endl;
+		cout<<"Correct Usage is "<<argv[0]<<"-g  <genotype file> -p <phenotype file> -c <covariate file>  -k <number of random vector> -jn <number of jackknife blocks>    -o <output file> -annot <annot file>"<<endl;
 		exit(-1);
 	}
 
