@@ -1,0 +1,61 @@
+OUTPUT: 
+Variances: 
+Sigma^2_0: 0.0310531
+Sigma^2_1: 0.0426654
+Sigma^2_2: 0.00287729
+Sigma^2_3: 0.0916655
+Sigma^2_4: 0.011388
+Sigma^2_5: 0.0115872
+Sigma^2_6: 0.0180761
+Sigma^2_7: -0.000245192
+Sigma^2_e: 0.50032
+
+h^2's (heritabilities) and e's (enrichments) are computed based on Equation 9 (overlapping setting) in the paper  https://doi.org/10.1038/s41467-020-17576-9:
+h^2's: 
+h^2 of bin 0 : 0.0437745 ,  se: 0.0645168
+h^2 of bin 1 : 0.060144 ,  se: 0.0413928
+h^2 of bin 2 : 0.00405603 ,  se: 0.0194196
+h^2 of bin 3 : 0.129218 ,  se: 0.064849
+h^2 of bin 4 : 0.0160532 ,  se: 0.0226741
+h^2 of bin 5 : 0.0163341 ,  se: 0.0285462
+h^2 of bin 6 : 0.0254813 ,  se: 0.0411057
+h^2 of bin 7 : -0.00034564 ,  se: 0.0106736
+h^2_i/h^2_t: 
+h^2/h^2_t of bin 0 : 0.148532,  se: 0.24036
+h^2/h^2_t of bin 1 : 0.204075,  se: 0.141281
+h^2/h^2_t of bin 2 : 0.0137625,  se: 0.0658452
+h^2/h^2_t of bin 3 : 0.438449,  se: 0.212088
+h^2/h^2_t of bin 4 : 0.0544703,  se: 0.0716484
+h^2/h^2_t of bin 5 : 0.0554235,  se: 0.0946501
+h^2/h^2_t of bin 6 : 0.0864607,  se: 0.145913
+h^2/h^2_t of bin 7 : -0.00117279,  se: 0.036261
+Enrichments: 
+Enrichment of bin 0 : 4.95105,  se: 8.01201
+Enrichment of bin 1 : 0.971785,  se: 0.672768
+Enrichment of bin 2 : 0.172032,  se: 0.823064
+Enrichment of bin 3 : 2.74031,  se: 1.32555
+Enrichment of bin 4 : 0.453919,  se: 0.59707
+Enrichment of bin 5 : 0.791764,  se: 1.35214
+Enrichment of bin 6 : 0.29814,  se: 0.503147
+Enrichment of bin 7 : -0.0293198,  se: 0.906524
+
+h^2's (heritabilities) and e's (enrichments) are computed based on Equations 2-4 (non-overlapping setting) in the paper  https://doi.org/10.1038/s41467-020-17576-9:
+h^2's: 
+h^2 of bin 0 : 0.0437745,  se: 0.0645168
+h^2 of bin 1 : 0.060144,  se: 0.0413928
+h^2 of bin 2 : 0.00405603,  se: 0.0194196
+h^2 of bin 3 : 0.129218,  se: 0.064849
+h^2 of bin 4 : 0.0160532,  se: 0.0226741
+h^2 of bin 5 : 0.0163341,  se: 0.0285462
+h^2 of bin 6 : 0.0254813,  se: 0.0411057
+h^2 of bin 7 : -0.00034564,  se: 0.0106736
+Total h^2 : 0.294715, se: 0.125077
+Enrichments: 
+Enrichment of bin 0: 4.95105 ,  se: 10.7136
+Enrichment of bin 1: 0.971785 ,  se: 0.654617
+Enrichment of bin 2: 0.172032 ,  se: 0.914118
+Enrichment of bin 3: 2.74031 ,  se: 1.2584
+Enrichment of bin 4: 0.453919 ,  se: 0.627488
+Enrichment of bin 5: 0.791764 ,  se: 1.50831
+Enrichment of bin 6: 0.29814 ,  se: 0.507076
+Enrichment of bin 7: -0.0293198 ,  se: 1.14531
