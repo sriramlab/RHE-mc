@@ -1,12 +1,12 @@
 # RHE-mc
-Randomized Heritability Estimation for Multi-variance Components
+Randomized Haseman–Elston regression for Multi-variance Components
 
 
 
 ## Prerequisites
 The following packages are required on a linux machine to compile and use the software package.
 ```
-g++
+g++ (4.4.7)
 cmake
 make
 ```
@@ -14,7 +14,7 @@ make
 ## How to install :
 
 ```
-git clone https://github.com/alipazokit/RHE-mc.git
+git clone https://github.com/sriramlab/RHE-mc.git
 cd RHE-mc
 mkdir build
 cd build/
@@ -27,6 +27,13 @@ An executable file named RHEmc will be in build folder after the installation st
  ```
  ./RHEmc <command_line arguments>
 ```
+To run the highly memory efficient version : (-jn 1000 is recommended when there are many overlapping annotations or small annotations)
+
+The memory usage of RHEmc_mem does not depend on number of jackknife blocks.
+```
+./RHEmc_mem <command_line arguments>
+
+```
 To estimate dominance heritability and additve heritability jointly run :
 
 ```
@@ -36,12 +43,12 @@ To estimate dominance heritability and additve heritability jointly run :
 ## Parameters
 
 ```
-genotype (-g) : The path of  genotype file
+genotype (-g) : The path of genotype file
 phenotype (-p): The path of phenotype file
 covariate (-c): The path of covariate file
 annotation (-annot): The path of annotation file.
 num_vec (-k) : The number of random vectors (10 is recommended). 
-num_block (-jn): The number of jackknife blocks. (100 or 22 are recommended). The higher number of jackknife blocks the higher memory usage.
+num_block (-jn): The number of jackknife blocks. (100 is recommended). The higher number of jackknife blocks the higher memory usage.
 out_put (-o): The path of output file.
 
 
@@ -70,7 +77,7 @@ chmod +x test.sh
 
 ## Citation
 ```
-Pazokitoroudi, A., Wu, Y., Burch, K.S. et al. Efficient variance components analysis across millions of genomes. Nat Commun 11, 4020 (2020). https://doi.org/10.1038/s41467-020-17576-9
+Pazokitoroudi, A. et al. Efficient variance components analysis across millions of genomes. Nat Commun 11, 4020 (2020). https://doi.org/10.1038/s41467-020-17576-9
 ```
 
 
