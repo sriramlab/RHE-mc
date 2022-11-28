@@ -1,7 +1,4 @@
-/** 
- All of this code is written by Aman Agrawal 
- (Indian Institute of Technology, Delhi)
-*/
+
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -83,6 +80,8 @@ int MAX_ITER;
 int k,p,n;
 int k_orig;
 
+double score;
+
 MatrixXdr c; //(p,k)
 MatrixXdr x; //(k,n)
 MatrixXdr v; //(p,k)
@@ -120,7 +119,17 @@ vector<int> Annot;
 int Njack=100;
 int Nbin=160;
 int Nz=10;
+int cov_num;
+int Nindv_mask;
+int NC;
 ///////
+MatrixXdr jack;
+MatrixXdr point_est;
+MatrixXdr enrich_jack;
+MatrixXdr enrich_point_est;
+
+
+
 
 //define random vector z's
 MatrixXdr  all_zb;
@@ -160,7 +169,7 @@ bool use_1col_annot=false;
 
 
 ///Variables for reg out cov on both side of LM
-bool both_side_cov=false;
+bool both_side_cov=true;
 MatrixXdr UXXz;
 MatrixXdr XXUz;
 MatrixXdr Xz;
@@ -487,84 +496,6 @@ void initial_var()
 
 
 
-/*void read_cov(int Nind, std::string filename, std::string covname){
-	ifstream ifs(filename.c_str(), ios::in); 
-	std::string line; 
-	std::istringstream in; 
-	int covIndex = 0; 
-	std::getline(ifs,line); 
-	in.str(line); 
-	string b;
-	vector<vector<int> > missing; 
-	int covNum=0;  
-	while(in>>b)
-	{
-		missing.push_back(vector<int>()); //push an empty row  
-		if(b==covname && covname!="")
-			covIndex=covNum; 
-		covNum++; 
-	}
-	vector<double> cov_sum(covNum, 0); 
-	if(covname=="")
-	{
-		covariate.resize(Nind, covNum); 
-		cout<< "Read in "<<covNum << " Covariates.. "<<endl;
-	}
-	else 
-	{
-		covariate.resize(Nind, 1); 
-		cout<< "Read in covariate "<<covname<<endl;  
-	}
-
-	
-	int j=0; 
-	while(std::getline(ifs, line)){
-		in.clear(); 
-		in.str(line);
-		string temp; 
-		for(int k=0; k<covNum; k++){
-			in>>temp;
-			if(temp=="NA")
-			{
-				missing[k].push_back(j);
-				continue;  
-			} 
-			int cur = atof(temp.c_str()); 
-			if(cur==-9)
-			{
-				missing[k].push_back(j); 
-				continue; 
-			}
-			if(covname=="")
-			{
-				cov_sum[k]= cov_sum[k]+ cur; 
-				covariate(j,k) = cur; 
-			}
-			else
-				if(k==covIndex)
-				{
-					covariate(j, 0) = cur;
-					cov_sum[k] = cov_sum[k]+cur; 
-				}
-		} 
-		j++;
-	}
-	//compute cov mean and impute 
-	for (int a=0; a<covNum ; a++)
-	{
-		int missing_num = missing[a].size(); 
-		cov_sum[a] = cov_sum[a] / (covNum - missing_num);
-
-		for(int b=0; b<missing_num; b++)
-		{
-                        int index = missing[a][b];
-                        if(covname=="")
-                                covariate(index, a) = cov_sum[a];
-                        else if (a==covIndex)
-                                covariate(index, 0) = cov_sum[a];
-                } 
-	}
-}*/
 void read_pheno2(int Nind, std::string filename){
 //	pheno.resize(Nind,1); 
 	ifstream ifs(filename.c_str(), ios::in); 
@@ -913,19 +844,20 @@ void read_annot (string filename){
 	   for(int j=0;j<Nbin;j++)
 		 if (annot_bool[i][j]==1){
 			temp=i/step_size;
-			if (temp==Njack)
-				temp--;
+			if (temp>=Njack)
+				temp=Njack-1;
 			//cout<<i<<"xxx"<<j<<"xxx"<<temp<<endl;
 			jack_bin[temp][j]++;	
 		 }
-/*	
+/*
 cout<<"jackbin"<<endl;
 	for (int i=0;i<Njack;i++){
 	   for(int j=0;j<Nbin;j++)
                 cout<<jack_bin[i][j]<<" ";
 	  cout<<endl;
-        }*/
-/*
+        }
+*/
+/*cout<<"annnot"<<endl;
 for (int i=0;i<linenum;i++){
   for(int j=0;j<Nbin;j++)
 	cout<<annot_bool[i][j]<<" ";
@@ -1121,111 +1053,6 @@ float get_observed_pj(const unsigned char* line){
         return observed_sum*0.5/observed_ct;
 
 }
-
-
-
-void read_bed (std::istream& ifs,bool allow_missing,int num_snp)  {
-         //ifstream ifs (filename.c_str(), ios::in|ios::binary);
-        char magic[3];
-        set_metadata ();
-
-    gtype =  new unsigned char[ncol];
-
-     if(read_header)  
-      binary_read(ifs,magic);
-
-        int sum=0;
-
-        // Note that the coding of 0 and 2 can get flipped relative to plink because plink uses allele frequency (minor)
-        // allele to code a SNP as 0 or 1.
-        // This flipping does not matter for results.
-        int y[4];
-        
-for(int i=0;i<num_snp;i++){
-		global_snp_index++;
-                ifs.read (reinterpret_cast<char*>(gtype), ncol*sizeof(unsigned char));
-                float p_j = get_observed_pj(gtype);
-        for (int k = 0 ;k < ncol ; k++) {
-                unsigned char c = gtype [k];
-                        // Extract PLINK genotypes
-                y[0] = (c)&mask2;
-                y[1] = (c>>2)&mask2;
-                y[2] = (c>>4)&mask2;
-                y[3] = (c>>6)&mask2;
-                        int j0 = k * unitsperword;
-                        // Handle number of individuals not being a multiple of 4
-                        int lmax = 4;
-                        if (k == ncol - 1)  {
-                                lmax = Nindv%4;
-                                lmax = (lmax==0)?4:lmax;
-                        }
-                        for ( int l = 0 ; l < lmax; l++){
-                                int j = j0 + l ;
-                                // Extract  PLINK coded genotype and convert into 0/1/2
-                                // PLINK coding: 
-                                // 00->0
-                                // 01->missing
-                                // 10->1
-                                // 11->2
-                                int val = y[l];
-                                if(val==1 && !allow_missing){
-                                        val = simulate2_geno_from_random(p_j);
-                                        val++;
-                                        val = (val==1) ? 0 : val;
-  //                                 val=0;
-				 }
-                                val-- ;
-                                val =  (val < 0 ) ? 0 :val ;
-				sum += val;
-			   
-			    for(int bin_index=0;bin_index<Nbin;bin_index++){
-				if(annot_bool[global_snp_index][bin_index]==1){
-                        	    
-				      int snp_index;
-				     //int snp_index=allgen[bin_index].index;
-				     //allgen[bin_index].gen(snp_index,j)=val;
-						
-				     if(use_mailman==true){
-				 	 snp_index=allgen_mail[bin_index].index;
-					 int horiz_seg_no = snp_index/allgen_mail[bin_index].segment_size_hori; 
-					 allgen_mail[bin_index].p[horiz_seg_no][j] = 3 *allgen_mail[bin_index].p[horiz_seg_no][j]  + val;	 
-				     // computing sum for every snp to compute mean
-				         allgen_mail[bin_index].columnsum[snp_index]+=val;
-
-				      }
-				     else{
-					 snp_index=allgen[bin_index].index;
-                                         allgen[bin_index].gen(snp_index,j)=val;
-				     }
-				
-				}
- 			     
-			    }
-
-                    }
-        }
-
-    for(int bin_index=0;bin_index<Nbin;bin_index++)
-       if(annot_bool[global_snp_index][bin_index]==1){
-       		//cout<<"global"<<global_snp_index<<endl;
-		        //cout<<allgen[bin_index].index<<endl; 
-		//       allgen[bin_index].index++;
-	
-	      if(use_mailman==true)
-		  allgen_mail[bin_index].index++;
-	       else
-	           allgen[bin_index].index++;		
-	}
-
-    
-
-   }        
-	
-	sum = 0 ;
-        delete[] gtype;
-}
-
-
 
 
 void read_bed2 (std::istream& ifs,bool allow_missing,int num_snp)  {
@@ -1437,6 +1264,7 @@ MatrixXdr jack_se(MatrixXdr jack){
 int nrows=jack.rows();
 int ncols=jack.cols();
 MatrixXdr sum_row=jack.rowwise().mean();
+//cout<<sum_row<<endl;
 MatrixXdr SEjack;
 SEjack=MatrixXdr::Zero(nrows,1);
 double temp_val=0;
@@ -1450,16 +1278,428 @@ for (int i=0;i<nrows;i++){
     SEjack(i,0)=sqrt(SEjack(i,0));
 }
 
-
 return SEjack;
 }
+
+void genotype_stream_pass(string name, int pass_num){
+
+
+ifstream ifs (name.c_str(), ios::in|ios::binary);
+read_header=true;
+global_snp_index=-1;
+
+MatrixXdr output;
+MatrixXdr vec1;
+MatrixXdr w1;
+MatrixXdr w2;
+MatrixXdr w3;
+
+MatrixXdr  A_trs(Nbin,Nbin);
+MatrixXdr b_trk(Nbin,1);
+MatrixXdr c_yky(Nbin,1);
+
+MatrixXdr X_l(Nbin+1,Nbin+1);
+MatrixXdr Y_r(Nbin+1,1);
+MatrixXdr B1;
+MatrixXdr B2;
+MatrixXdr C1;
+MatrixXdr C2;
+double trkij;
+double yy=(pheno.array() * pheno.array()).sum();
+
+if(both_side_cov==true){
+MatrixXdr Wty=covariate.transpose()*pheno; //W^ty
+MatrixXdr QWty=Q*Wty;
+double temp=(Wty.array() * QWty.array()).sum();
+        yy=yy-temp;
+}
+
+Nindv_mask=mask.sum();
+if(both_side_cov==true)
+   NC=Nindv_mask-cov_num;
+else
+   NC=Nindv_mask;
+
+
+
+MatrixXdr herit;
+
+
+/*MatrixXdr jack;
+MatrixXdr point_est;
+MatrixXdr enrich_jack;
+MatrixXdr enrich_point_est;
+*/
+jack.resize(Nbin+1,Njack);
+point_est.resize(Nbin+1,1);
+
+enrich_jack.resize(Nbin,Njack);
+enrich_point_est.resize(Nbin,1);
+
+
+MatrixXdr h1;
+MatrixXdr h2;
+MatrixXdr h3;
+
+double trkij_res1;
+double trkij_res2;
+double trkij_res3;
+double tk_res;
+
+
+
+
+for (int jack_index=0;jack_index<Njack;jack_index++){	
+
+	int read_Nsnp=(jack_index<(Njack-1)) ? (step_size) : (step_size+step_size_rem);
+	cout<<"Reading block "<<jack_index<<endl;
+
+       if(use_mailman==true){
+        for (int i=0;i<Nbin;i++){
+	allgen_mail[i].segment_size_hori = floor(log(Nindv)/log(3)) - 2 ;
+        allgen_mail[i].Nsegments_hori = ceil(jack_bin[jack_index][i]*1.0/(allgen_mail[i].segment_size_hori*1.0));
+        allgen_mail[i].p.resize(allgen_mail[i].Nsegments_hori,std::vector<int>(Nindv));
+        //allgen_mail[i].not_O_i.resize(jack_bin[jack_index][i]);
+        //allgen_mail[i].not_O_j.resize(Nindv);
+	allgen_mail[i].index=0;
+	allgen_mail[i].Nsnp=jack_bin[jack_index][i];
+	allgen_mail[i].Nindv=Nindv;
+       	
+	 allgen_mail[i].columnsum.resize(jack_bin[jack_index][i],1);
+	  for (int index_temp=0;index_temp<jack_bin[jack_index][i];index_temp++)
+		    allgen_mail[i].columnsum[index_temp]=0;
+
+	 }
+       }
+       else{
+	   for (int k=0;k<Nbin;k++){
+                allgen[k].gen.resize(jack_bin[jack_index][k],Nindv);
+                allgen[k].index=0;
+           }
+       }
+
+       
+	if(use_1col_annot==true)
+		read_bed_1colannot(ifs,missing,read_Nsnp);
+	else
+		read_bed2(ifs,missing,read_Nsnp);
+       read_header=false;
+
+     for (int bin_index=0;bin_index<Nbin;bin_index++){
+	  int num_snp;
+	  if (use_mailman==true)
+		num_snp=allgen_mail[bin_index].index;
+	  else
+		num_snp=allgen[bin_index].index;
+	
+	  //cout<<"bin number"<<bin_index<<"number of SNPs"<<num_snp<<endl;
+
+	  if(num_snp!=0){
+	  stds.resize(num_snp,1);
+	  means.resize(num_snp,1);
+	//  	   cout<<"bin number"<<bin_index<<"number of SNPs"<<num_snp<<endl;
+	  if(use_mailman==true){
+		for (int i=0;i<num_snp;i++)
+		   means(i,0)=(double)allgen_mail[bin_index].columnsum[i]/Nindv;
+    	 }			
+          else	  
+		means=allgen[bin_index].gen.rowwise().mean();
+          
+
+	  for (int i=0;i<num_snp;i++)
+	       stds(i,0)=1/sqrt((means(i,0)*(1-(0.5*means(i,0)))));
+
+
+	   if (use_mailman==true){
+	   	g=allgen_mail[bin_index];
+                 g.segment_size_hori = floor(log(Nindv)/log(3)) - 2 ;
+        	 g.Nsegments_hori = ceil(jack_bin[jack_index][bin_index]*1.0/(g.segment_size_hori*1.0));
+        	 g.p.resize(g.Nsegments_hori,std::vector<int>(Nindv));
+        	 //g.not_O_i.resize(jack_bin[jack_index][bin_index]);
+        	 //g.not_O_j.resize(Nindv);
+		initial_var();
+	   }
+	  else{
+		 gen=allgen[bin_index].gen;
+		
+          }  
+
+	 output=compute_XXz(num_snp);
+
+	   for (int z_index=0;z_index<Nz;z_index++){
+		//if(num_snp!=len[bin_index])
+                 //XXz.col((bin_index*(Njack+1)*Nz)+(jack_index*Nz)+z_index)=output.col(z_index);
+                 if(pass_num==1){
+		         XXz.col((bin_index*2*Nz)+Nz+z_index)+=output.col(z_index);   /// save whole sample
+		 }
+		 else if(num_snp!=len[bin_index])
+			 XXz.col((bin_index*2*Nz)+z_index)=XXz.col((bin_index*2*Nz)+Nz+z_index)-output.col(z_index);   /// save corresponding jack contrib
+
+		 if(both_side_cov==true) {
+		  vec1=output.col(z_index);
+		  w1=covariate.transpose()*vec1;
+                  w2=Q*w1;
+                  w3=covariate*w2;
+		  if(pass_num==1){
+		     UXXz.col((bin_index*2*Nz)+Nz+z_index)+=w3;
+		     UXXz.col((bin_index*2*Nz)+z_index)+=w3;
+		  }
+		  else if(num_snp!=len[bin_index])
+		     UXXz.col((bin_index*2*Nz)+z_index)=UXXz.col((bin_index*2*Nz)+Nz+z_index)-w3;
+
+		 }
+
+            }
+
+	   if (both_side_cov==true){
+	      output=compute_XXUz(num_snp); 
+	      for (int z_index=0;z_index<Nz;z_index++){
+                if(pass_num==1){
+		   XXUz.col((bin_index*2*Nz)+Nz+z_index)+=output.col(z_index);   /// save whole sample
+		}
+	        else if(num_snp!=len[bin_index])
+		    XXUz.col((bin_index*2*Nz)+z_index)=XXUz.col((bin_index*2*Nz)+Nz+z_index)-output.col(z_index);
+	      }	 
+	  }
+		   
+	   //compute yXXy
+		double temp_yxxy;
+	   if(both_side_cov==false)
+	   temp_yxxy= compute_yXXy(num_snp);
+	   else
+	   temp_yxxy= compute_yVXXVy(num_snp);
+
+	  if(pass_num==1){
+           yXXy(bin_index,1)+=temp_yxxy;
+	  }
+	  else if(num_snp!=len[bin_index]){
+	     yXXy(bin_index,0)= yXXy(bin_index,1)-temp_yxxy;
+	   }
+
+	
+	//cout<<num_snp<< "SNPs in bin "<<bin_index<<"of jack "<<jack_index<<endl;   
+	//cout<<" Reading and computing bin "<<bin_index <<"  of "<< jack_index<<"-th is finished"<<endl;
+	   
+	    if(use_mailman==true){
+		delete[] sum_op;
+        	delete[] partialsums;
+       		 delete[] yint_e;
+        	delete[] yint_m;
+        	for (int i  = 0 ; i < hsegsize; i++)
+                	delete[] y_m [i];
+        	delete[] y_m;
+
+        	for (int i  = 0 ; i < g.Nindv; i++)
+                	delete[] y_e[i];
+        	delete[] y_e;
+
+        	std::vector< std::vector<int> >().swap(g.p);
+        	//std::vector< std::vector<int> >().swap(g.not_O_j);
+        	//std::vector< std::vector<int> >().swap(g.not_O_i);
+		std::vector< std::vector<int> >().swap(allgen_mail[bin_index].p);
+                //std::vector< std::vector<int> >().swap(allgen_mail[bin_index].not_O_j);
+                //std::vector< std::vector<int> >().swap(allgen_mail[bin_index].not_O_i);
+        	g.columnsum.clear();
+        	g.columnsum2.clear();
+        	g.columnmeans.clear();
+       		 g.columnmeans2.clear();
+		 allgen_mail[bin_index].columnsum.clear();
+                allgen_mail[bin_index].columnsum2.clear();
+                allgen_mail[bin_index].columnmeans.clear();
+                 allgen_mail[bin_index].columnmeans2.clear();
+	    }
+        }
+
+     }
+//cout<<" Reading and computing  of "<< jack_index<<"-th is finished"<<endl;
+
+if(pass_num==2){
+   
+
+for(int l=0;l<Nbin;l++)
+   if( len[l]==jack_bin[jack_index][l])
+        jack_bin[jack_index][l]=0;
+
+for (int i=0;i<Nbin;i++){
+
+	if(both_side_cov==false)	
+             b_trk(i,0)=Nindv_mask;
+
+        c_yky(i,0)=yXXy(i,0)/(len[i]-jack_bin[jack_index][i]);
+  
+       
+	if(both_side_cov==true){
+	B1=XXz.block(0,(i*2*Nz),Nindv,Nz);
+	C1=B1.array()*all_Uzb.array();
+        C2=C1.colwise().sum();	
+	tk_res=C2.sum();  
+
+        tk_res=tk_res/(len[i]-jack_bin[jack_index][i])/Nz;
+
+        b_trk(i,0)=Nindv_mask-tk_res;
+	}
+
+       for (int j=i;j<Nbin;j++){
+                B1=XXz.block(0,(i*2*Nz),Nindv,Nz);
+                B2=XXz.block(0,(j*2*Nz),Nindv,Nz);
+                C1=B1.array()*B2.array();
+                C2=C1.colwise().sum();
+                trkij=C2.sum();
+
+
+		if(both_side_cov==true){
+
+			h1=covariate.transpose()*B1;
+                        h2=Q*h1;
+                        h3=covariate*h2;
+			C1=h3.array()*B2.array();
+		        C2=C1.colwise().sum();
+                        trkij_res1=C2.sum();
+
+
+			B1=XXUz.block(0,(i*2*Nz),Nindv,Nz);
+               	        B2=UXXz.block(0,(j*2*Nz),Nindv,Nz);
+                        C1=B1.array()*B2.array();
+                        C2=C1.colwise().sum();
+                        trkij_res3=C2.sum();
+
+			
+			trkij+=trkij_res3-trkij_res1-trkij_res1 ;
+			
+	     }
+
+                 trkij=trkij/(len[i]-jack_bin[jack_index][i])/(len[j]-jack_bin[jack_index][j])/Nz;
+                A_trs(i,j)=trkij;
+                A_trs(j,i)=trkij;
+
+        }
+  }
+
+
+X_l<<A_trs,b_trk,b_trk.transpose(),NC;
+Y_r<<c_yky,yy;
+herit=X_l.colPivHouseholderQr().solve(Y_r);
+/*
+cout<<"X_l"<<endl<<X_l<<endl;
+cout<<"Y_r"<<endl<<Y_r<<endl;
+cout<<"herit"<<endl<<herit<<endl;
+*/
+for(int i=0;i<(Nbin+1);i++)
+      jack(i,jack_index)=herit(i,0);
+
+
+//handle when a jackknife block does not include any SNPs from a bin
+
+for (int bin_index=0;bin_index<Nbin;bin_index++){
+         for (int z_index=0;z_index<Nz;z_index++){
+                  XXz.col((bin_index*2*Nz)+z_index)=XXz.col((bin_index*2*Nz)+Nz+z_index);
+                  if(both_side_cov==true){
+                  UXXz.col((bin_index*2*Nz)+z_index)=UXXz.col((bin_index*2*Nz)+Nz+z_index);
+                  XXUz.col((bin_index*2*Nz)+z_index)=XXUz.col((bin_index*2*Nz)+Nz+z_index);
+                  }
+         }
+        yXXy(bin_index,0)= yXXy(bin_index,1);
+}
+
+
+} //end if pass_num=2
+
+
+
+
+}//end loop over jack
+cout<<" Reading and computing  of all blocks are finished"<<endl;
+
+if(pass_num==1){
+  //handle when jackknife block does not include any SNPs from a bin//refill
+  for (int bin_index=0;bin_index<Nbin;bin_index++){
+	 for (int z_index=0;z_index<Nz;z_index++){
+		  XXz.col((bin_index*2*Nz)+z_index)=XXz.col((bin_index*2*Nz)+Nz+z_index);
+		  if(both_side_cov==true){
+		  UXXz.col((bin_index*2*Nz)+z_index)=UXXz.col((bin_index*2*Nz)+Nz+z_index);
+		  XXUz.col((bin_index*2*Nz)+z_index)=XXUz.col((bin_index*2*Nz)+Nz+z_index);  
+       		  }
+	 }
+        yXXy(bin_index,0)= yXXy(bin_index,1);
+  }
+}
+
+if(pass_num==2){
+for (int i=0;i<Nbin;i++){
+	c_yky(i,0)=yXXy(i,1)/len[i];
+	
+	 if(both_side_cov==false)
+             b_trk(i,0)=Nindv_mask;
+
+	 if(both_side_cov==true){
+        	B1=XXz.block(0,(i*2*Nz)+Nz,Nindv,Nz);
+        	C1=B1.array()*all_Uzb.array();
+        	C2=C1.colwise().sum();
+        	tk_res=C2.sum();
+                tk_res=tk_res/len[i]/Nz;
+        
+                 b_trk(i,0)=Nindv_mask-tk_res;
+        }
+
+	for (int j=i;j<Nbin;j++){
+                B1=XXz.block(0,(i*2*Nz)+Nz,Nindv,Nz);
+                B2=XXz.block(0,(j*2*Nz)+Nz,Nindv,Nz);
+                C1=B1.array()*B2.array();
+                C2=C1.colwise().sum();
+                trkij=C2.sum();
+                
+
+                if(both_side_cov==true){
+                
+                        h1=covariate.transpose()*B1;
+                        h2=Q*h1;
+                        h3=covariate*h2;
+                        C1=h3.array()*B2.array();
+                        C2=C1.colwise().sum();
+                        trkij_res1=C2.sum();
+                        
+
+                        B1=XXUz.block(0,(i*2*Nz)+Nz,Nindv,Nz);
+                        B2=UXXz.block(0,(j*2*Nz)+Nz,Nindv,Nz);
+                        C1=B1.array()*B2.array();
+                        C2=C1.colwise().sum();
+                        trkij_res3=C2.sum();
+                        
+
+                        trkij+=trkij_res3-trkij_res1-trkij_res1 ;
+                        
+             }
+             
+                trkij=trkij/len[i]/len[j]/Nz;
+                A_trs(i,j)=trkij;
+                A_trs(j,i)=trkij;
+                
+        }
+}     
+  
+
+X_l<<A_trs,b_trk,b_trk.transpose(),NC;
+Y_r<<c_yky,yy;
+
+herit=X_l.colPivHouseholderQr().solve(Y_r);
+
+cout<<"Xl"<<endl<<X_l<<endl;
+cout<<"Yl"<<endl<<Y_r<<endl;
+   
+for(int i=0;i<(Nbin+1);i++)
+    point_est(i,0)=herit(i,0);
+
+}
+
+}
+
+
+
+
 
 int main(int argc, char const *argv[]){
  
 
-bool a=1;
-double b=3.1455555;
-cout<<double(a*b)<<endl; 
 
 parse_args(argc,argv);
 ////////////////////////////////////////////
@@ -1492,7 +1732,7 @@ parse_args(argc,argv);
 string filename;
 //////////////////////////// Read multi genotypes
 string line;
-int cov_num;
+ cov_num;
 int num_files=0;
 string geno_name=command_line_opts.GENOTYPE_FILE_PATH;
 
@@ -1553,14 +1793,7 @@ covariate=covariate.cwiseProduct(mat_mask);
 
 MatrixXdr WtW= covariate.transpose()*covariate;
 Q=WtW.inverse(); // Q=(W^tW)^-1
-//cout<<" Number of covariates"<<cov_num<<endl;
 
-/*MatrixXdr v1=covariate.transpose()*pheno; //W^ty
-MatrixXdr v2=Q*v1;            //QW^ty
-MatrixXdr v3=covariate*v2;    //WQW^ty
-new_pheno=pheno-v3;
-new_pheno=new_pheno.cwiseProduct(mask);
-*/
 if (both_side_cov==false){
 MatrixXdr v1=covariate.transpose()*pheno; //W^ty
 MatrixXdr v2=Q*v1;            //QW^ty
@@ -1570,10 +1803,12 @@ pheno=new_pheno.cwiseProduct(mask);
 
 y_sum=pheno.sum();
 y_mean = y_sum/mask.sum();
-  for(int i=0; i<Nindv; i++){
-       if(pheno(i,0)!=0)
+
+
+for(int i=0; i<Nindv; i++){
+	if(mask(i,0)!=0)
            pheno(i,0) =pheno(i,0) - y_mean; //center phenotype
-  }
+}
 y_sum=pheno.sum();
 
 }
@@ -1582,7 +1817,7 @@ if (both_side_cov==true){
 y_sum=pheno.sum();
 y_mean = y_sum/mask.sum();
   for(int i=0; i<Nindv; i++){
-       if(pheno(i,0)!=0)
+       if(mask(i,0)!=0)
            pheno(i,0) =pheno(i,0) - y_mean; //center phenotype
   }
 y_sum=pheno.sum();
@@ -1597,15 +1832,13 @@ new_pheno=new_pheno.cwiseProduct(mask);
 
 }
 	
-
-
-
 }
 if(use_cov==false){
 y_sum=pheno.sum();
 y_mean = y_sum/mask.sum();
-  for(int i=0; i<Nindv; i++){
-       if(pheno(i,0)!=0)
+
+for(int i=0; i<Nindv; i++){
+       if(mask(i,0)!=0)
            pheno(i,0) =pheno(i,0) - y_mean; //center phenotype
   }
 y_sum=pheno.sum();
@@ -1657,6 +1890,7 @@ for (int i=0;i<Nz;i++)
    for(int j=0;j<Nindv;j++)
       all_zb(j,i)=all_zb(j,i)*mask(j,0);
 
+
 /*
 for (int i=0;i<Nindv;i++)
 for (int j=0;j<Nz;j++)
@@ -1682,16 +1916,14 @@ MatrixXdr output;
 //e
 //Njack=1;
 
-XXz=MatrixXdr::Zero(Nindv,Nbin*(Njack+1)*Nz);
+XXz=MatrixXdr::Zero(Nindv,Nbin*Nz*2);
 
 if(both_side_cov==true){
-UXXz=MatrixXdr::Zero(Nindv,Nbin*(Njack+1)*Nz);
-XXUz=MatrixXdr::Zero(Nindv,Nbin*(Njack+1)*Nz);
-//Xz=MatrixXdr::Zero(Nindv,Nbin*(Njack+1)*Nz);
+UXXz=MatrixXdr::Zero(Nindv,Nbin*Nz*2);
+XXUz=MatrixXdr::Zero(Nindv,Nbin*Nz*2);
 }
-yXXy=MatrixXdr::Zero(Nbin,Njack+1);
+yXXy=MatrixXdr::Zero(Nbin,2);
 
-//allgen.resize(Nbin);
 if(use_mailman==true) 
   allgen_mail.resize(Nbin);
 else
@@ -1707,470 +1939,31 @@ ifstream ifs (name.c_str(), ios::in|ios::binary);
 read_header=true;
 global_snp_index=-1;
 
+if (!ifs.is_open()){
+   cerr << "Error reading file "<< name  <<endl;
+    exit(1);
+}
+	
 
 cout<<"Start reading genotypes in blocks"<<endl;
     
 
-
-MatrixXdr vec1;
-MatrixXdr w1;
-MatrixXdr w2;
-MatrixXdr w3;
-
-
-for (int jack_index=0;jack_index<Njack;jack_index++){	
-
-	int read_Nsnp=(jack_index<(Njack-1)) ? (step_size) : (step_size+step_size_rem);
-	//cout<<Nsnp<<endl;
-/*	for (int bin_index=0;bin_index<Nbin;bin_index++){
-	
-
-	        allgen[bin_index].gen.resize(jack_bin[jack_index][bin_index],Nindv);
-	        allgen[bin_index].index=0;
-       }
-*/
-       if(use_mailman==true){
-        for (int i=0;i<Nbin;i++){
-  //      cout<<"eee"<<endl;
-	allgen_mail[i].segment_size_hori = floor(log(Nindv)/log(3)) - 2 ;
-        allgen_mail[i].Nsegments_hori = ceil(jack_bin[jack_index][i]*1.0/(allgen_mail[i].segment_size_hori*1.0));
-        allgen_mail[i].p.resize(allgen_mail[i].Nsegments_hori,std::vector<int>(Nindv));
-        allgen_mail[i].not_O_i.resize(jack_bin[jack_index][i]);
-        allgen_mail[i].not_O_j.resize(Nindv);
-	allgen_mail[i].index=0;
-	allgen_mail[i].Nsnp=jack_bin[jack_index][i];
-	allgen_mail[i].Nindv=Nindv;
-       	
-	 allgen_mail[i].columnsum.resize(jack_bin[jack_index][i],1);
-	  for (int index_temp=0;index_temp<jack_bin[jack_index][i];index_temp++)
-		    allgen_mail[i].columnsum[index_temp]=0;
-
-	 }
-       }
-       else{
-	   for (int bin_index=0;bin_index<Nbin;bin_index++){
-                allgen[bin_index].gen.resize(jack_bin[jack_index][bin_index],Nindv);
-                allgen[bin_index].index=0;
-           }
-       }
-
-       
-	if(use_1col_annot==true)
-		read_bed_1colannot(ifs,missing,read_Nsnp);
-	else
-		read_bed2(ifs,missing,read_Nsnp);
-       read_header=false;
-
-     for (int bin_index=0;bin_index<Nbin;bin_index++){
-	  int num_snp;
-	  if (use_mailman==true)
-		num_snp=allgen_mail[bin_index].index;
-	  else
-		num_snp=allgen[bin_index].index;
-
-
-	  if(num_snp!=0){
-	  stds.resize(num_snp,1);
-	  means.resize(num_snp,1);
-	  
-	  if(use_mailman==true){
-		for (int i=0;i<num_snp;i++)
-		   means(i,0)=(double)allgen_mail[bin_index].columnsum[i]/Nindv;
-    	 }			
-          else	  
-		means=allgen[bin_index].gen.rowwise().mean();
-          
-
-	  for (int i=0;i<num_snp;i++)
-	       stds(i,0)=1/sqrt((means(i,0)*(1-(0.5*means(i,0)))));
-
-	   //gen=allgen[bin_index].gen;
-	   
-	//   cout<<"gen rows"<<gen.rows()<<endl;
-//	   cout<<"jack "<<jack_index<<" bin "<<bin_index<<" num smp "<<num_snp<<endl;
-
-	   if (use_mailman==true){
-	   	g=allgen_mail[bin_index];
-                 g.segment_size_hori = floor(log(Nindv)/log(3)) - 2 ;
-        	 g.Nsegments_hori = ceil(jack_bin[jack_index][bin_index]*1.0/(g.segment_size_hori*1.0));
-        	 g.p.resize(g.Nsegments_hori,std::vector<int>(Nindv));
-        	 g.not_O_i.resize(jack_bin[jack_index][bin_index]);
-        	 g.not_O_j.resize(Nindv);
-		initial_var();
-	   }
-	  else{
-		 gen=allgen[bin_index].gen;
-		
-          }  
-
-	 output=compute_XXz(num_snp);
-
-	  /* if(use_mailman==true){
-                cout<<"tttttttt"<<endl;
-		g=allgen_mail[bin_index];
-		initial_var();
-	        output=compute_XXz(num_snp);
-           }*/
-
-          // cout<<"dddddddddddddd"<<endl;
-	   for (int z_index=0;z_index<Nz;z_index++){
-		if(num_snp!=len[bin_index])
-                 XXz.col((bin_index*(Njack+1)*Nz)+(jack_index*Nz)+z_index)=output.col(z_index);
-                 XXz.col((bin_index*(Njack+1)*Nz)+(Njack*Nz)+z_index)+=output.col(z_index);   /// save whole sample
-
-		 if(both_side_cov==true) {
-		  vec1=output.col(z_index);
-		  w1=covariate.transpose()*vec1;
-                  w2=Q*w1;
-                  w3=covariate*w2;
-		  if(num_snp!=len[bin_index])
-		  UXXz.col((bin_index*(Njack+1)*Nz)+(jack_index*Nz)+z_index)=w3;
-		  UXXz.col((bin_index*(Njack+1)*Nz)+(Njack*Nz)+z_index)+=w3;
-		 }
-
-            }
-
-	   if (both_side_cov==true){
-	      output=compute_XXUz(num_snp); 
-	      for (int z_index=0;z_index<Nz;z_index++){
-                   if(num_snp!=len[bin_index])
-		   XXUz.col((bin_index*(Njack+1)*Nz)+(jack_index*Nz)+z_index)=output.col(z_index);
-                 XXUz.col((bin_index*(Njack+1)*Nz)+(Njack*Nz)+z_index)+=output.col(z_index);   /// save whole sample
-	       }	 
-	  }
-		   
-	   //compute yXXy
-		
-	   if(both_side_cov==false)
-	   yXXy(bin_index,jack_index)= compute_yXXy(num_snp);
-	   else
-	   yXXy(bin_index,jack_index)= compute_yVXXVy(num_snp);
-
-           yXXy(bin_index,Njack)+= yXXy(bin_index,jack_index);
-	
-	   if(num_snp==len[bin_index])
-		yXXy(bin_index,jack_index)=0;
-
-	  //compute Xz
-/*
-	  if(both_side_cov==true){
-		MatrixXdr out2=compute_Xz(num_snp);
-		 for (int z_index=0;z_index<Nz;z_index++){
-			  if(num_snp!=len[bin_index])
-		          Xz.col((bin_index*(Njack+1)*Nz)+(jack_index*Nz)+z_index)=out2.col(z_index);
-                 	  Xz.col((bin_index*(Njack+1)*Nz)+(Njack*Nz)+z_index)+=out2.col(z_index);	
-		 }
-	  }
-
-*/
-	
-	cout<<num_snp<< "SNPs in bin "<<bin_index<<"of jack "<<jack_index<<endl;   
-	cout<<" Reading and computing bin "<<bin_index <<"  of "<< jack_index<<"-th is finished"<<endl;
-	   
-	    if(use_mailman==true){
-		delete[] sum_op;
-        	delete[] partialsums;
-       		 delete[] yint_e;
-        	delete[] yint_m;
-        	for (int i  = 0 ; i < hsegsize; i++)
-                	delete[] y_m [i];
-        	delete[] y_m;
-
-        	for (int i  = 0 ; i < g.Nindv; i++)
-                	delete[] y_e[i];
-        	delete[] y_e;
-
-        	std::vector< std::vector<int> >().swap(g.p);
-        	std::vector< std::vector<int> >().swap(g.not_O_j);
-        	std::vector< std::vector<int> >().swap(g.not_O_i);
-		std::vector< std::vector<int> >().swap(allgen_mail[bin_index].p);
-                std::vector< std::vector<int> >().swap(allgen_mail[bin_index].not_O_j);
-                std::vector< std::vector<int> >().swap(allgen_mail[bin_index].not_O_i);
-        //g.p.clear();
-        //g.not_O_j.clear();
-        //g.not_O_i.clear();
-        	g.columnsum.clear();
-        	g.columnsum2.clear();
-        	g.columnmeans.clear();
-       		 g.columnmeans2.clear();
-		 allgen_mail[bin_index].columnsum.clear();
-                allgen_mail[bin_index].columnsum2.clear();
-                allgen_mail[bin_index].columnmeans.clear();
-                 allgen_mail[bin_index].columnmeans2.clear();
-	    }
-        }
-
-     }
-//cout<<" Reading and computing  of "<< jack_index<<"-th is finished"<<endl;
-}
-
-cout<<" Reading and computing  of all blocks are finished"<<endl;
-
-for(int bin_index=0;bin_index<Nbin;bin_index++){
-for(int jack_index=0;jack_index<Njack;jack_index++){
-        for (int z_index=0;z_index<Nz;z_index++){
-         
-	MatrixXdr v1=XXz.col((bin_index*(Njack+1)*Nz)+(Njack*Nz)+z_index);
-        MatrixXdr v2=XXz.col((bin_index*(Njack+1)*Nz)+(jack_index*Nz)+z_index);
-	XXz.col((bin_index*(Njack+1)*Nz)+(jack_index*Nz)+z_index)=v1-v2;
-
-	if(both_side_cov==true){
-	     v1=XXUz.col((bin_index*(Njack+1)*Nz)+(Njack*Nz)+z_index);
-             v2=XXUz.col((bin_index*(Njack+1)*Nz)+(jack_index*Nz)+z_index);
-             XXUz.col((bin_index*(Njack+1)*Nz)+(jack_index*Nz)+z_index)=v1-v2;
-	
-	     v1=UXXz.col((bin_index*(Njack+1)*Nz)+(Njack*Nz)+z_index);
-             v2=UXXz.col((bin_index*(Njack+1)*Nz)+(jack_index*Nz)+z_index);
-             UXXz.col((bin_index*(Njack+1)*Nz)+(jack_index*Nz)+z_index)=v1-v2;
-
-	  
-           /*  v1=Xz.col((bin_index*(Njack+1)*Nz)+(Njack*Nz)+z_index);
-             v2=Xz.col((bin_index*(Njack+1)*Nz)+(jack_index*Nz)+z_index);
-             Xz.col((bin_index*(Njack+1)*Nz)+(jack_index*Nz)+z_index)=v1-v2;
-	    */
-	}
-
-	
-
-       }
-        yXXy(bin_index,jack_index)=yXXy(bin_index,Njack)-yXXy(bin_index,jack_index);
-}
-}
-
-
-
-
-
-
-//cout<<"sum col "<<XXz.col(1).sum()<<endl;
-//cout<<"yXXy"<<yXXy<<endl;
-	
-//// all XXy and yXXy and contributions of every jackknife subsamples  were computed till this line.
-
-/// normal equations LHS
-MatrixXdr  A_trs(Nbin,Nbin);
-MatrixXdr b_trk(Nbin,1);
-MatrixXdr c_yky(Nbin,1);
-
-MatrixXdr X_l(Nbin+1,Nbin+1);
-MatrixXdr Y_r(Nbin+1,1);
-//int bin_index=0;
-int jack_index=Njack;
-MatrixXdr B1;
-MatrixXdr B2;
-MatrixXdr C1;
-MatrixXdr C2;
-double trkij;
-double yy=(pheno.array() * pheno.array()).sum();
-
-
-if(both_side_cov==true){
-MatrixXdr Wty=covariate.transpose()*pheno; //W^ty
-MatrixXdr QWty=Q*Wty;
-double temp=(Wty.array() * QWty.array()).sum();
-	yy=yy-temp;
-}
-
-
-
-
-int Nindv_mask=mask.sum();
-int NC;
-if(both_side_cov==true)
-   NC=Nindv_mask-cov_num;
-else
-   NC=Nindv_mask;
-
-
-
-
-
-
-
-MatrixXdr jack;
-MatrixXdr point_est;
-MatrixXdr enrich_jack;
-MatrixXdr enrich_point_est;
-
-jack.resize(Nbin+1,Njack);
-point_est.resize(Nbin+1,1);
-
-enrich_jack.resize(Nbin,Njack);
-enrich_point_est.resize(Nbin,1);
-
-/*cout<<yXXy<<endl;
-for (int i=0;i<Nbin;i++)
-   cout<<len[i]<<endl;
-*/
-
-MatrixXdr h1;
-MatrixXdr h2;
-MatrixXdr h3;
-
-double trkij_res1;
-double trkij_res2;
-double trkij_res3;
-double tk_res;
-for (jack_index=0;jack_index<=Njack;jack_index++){
-  for (int i=0;i<Nbin;i++){
-
-	if(both_side_cov==false)	
-             b_trk(i,0)=Nindv_mask;
-
-	if( jack_index<Njack && len[i]==jack_bin[jack_index][i])
-		 jack_bin[jack_index][i]=0;
-
-
-        if(jack_index==Njack)
-        c_yky(i,0)=yXXy(i,jack_index)/len[i];
-        else
-        c_yky(i,0)=yXXy(i,jack_index)/(len[i]-jack_bin[jack_index][i]);
-        //cout<<"bin "<<i<<"yXXy "<<yXXy(i,jack_index)<<endl;
-  
-       
-	if(both_side_cov==true){
-	B1=XXz.block(0,(i*(Njack+1)*Nz)+(jack_index*Nz),Nindv,Nz);
-	C1=B1.array()*all_Uzb.array();
-        C2=C1.colwise().sum();	
-	tk_res=C2.sum();  
-
-	if(jack_index==Njack)
-            tk_res=tk_res/len[i]/Nz;
-        else
-           tk_res=tk_res/(len[i]-jack_bin[jack_index][i])/Nz;
-
-        b_trk(i,0)=Nindv_mask-tk_res;
-	}
-
-       for (int j=i;j<Nbin;j++){
-                //cout<<Njack<<endl;
-                B1=XXz.block(0,(i*(Njack+1)*Nz)+(jack_index*Nz),Nindv,Nz);
-                B2=XXz.block(0,(j*(Njack+1)*Nz)+(jack_index*Nz),Nindv,Nz);
-                C1=B1.array()*B2.array();
-                C2=C1.colwise().sum();
-                trkij=C2.sum();
-
-
-		if(both_side_cov==true){
-
-			h1=covariate.transpose()*B1;
-                        h2=Q*h1;
-                        h3=covariate*h2;
-			C1=h3.array()*B2.array();
-		        C2=C1.colwise().sum();
-                        trkij_res1=C2.sum();
-
-		        /*h1=covariate.transpose()*B2;
-                        h2=Q*h1;
-                        h3=covariate*h2;
-                        C1=h3.array()*B1.array();
-                        C2=C1.colwise().sum();
-                        trkij_res2=C2.sum();
-			*/
-
-			B1=XXUz.block(0,(i*(Njack+1)*Nz)+(jack_index*Nz),Nindv,Nz);
-               	        B2=UXXz.block(0,(j*(Njack+1)*Nz)+(jack_index*Nz),Nindv,Nz);
-                        C1=B1.array()*B2.array();
-                        C2=C1.colwise().sum();
-                        trkij_res3=C2.sum();
-
-			
-/*			cout<<"trrrr"<<endl;
-			cout<<trkij<<endl;
-			cout<<trkij_res3<<endl;
-	//		cout<<trkij_res2<<endl;
-			cout<<trkij_res1<<endl;
-			 cout<<"trrrr"<<endl;
-*/
-			trkij+=trkij_res3-trkij_res1-trkij_res1 ;
-	     
-			
-/*
-		       B1=Xz.block(0,(i*(Njack+1)*Nz)+(jack_index*Nz),Nindv,Nz);
-		       h1=covariate.transpose()*B1; //W^tXz
-                       h2=Q*h1;  //QW^tXz
-		       
-		       C1=h2.array()*h1.array();
-                        C2=C1.colwise().sum();
-
-			tk_res=C2.sum();	
-
-			if(jack_index==Njack)
-				tk_res=tk_res/len[i]/Nz;
-			else
-			  	tk_res=tk_res/(len[i]-jack_bin[jack_index][i])/Nz;	
-		
-		 	b_trk(i,0)=Nindv_mask-tk_res;
-*/
-	     }
-
-
-
-
-                //cout<<"tr"<<i<<" "<<j<<" : "<<trkij<<endl;
-                if(jack_index==Njack)
-                trkij=trkij/len[i]/len[j]/Nz;
-                else
-                 trkij=trkij/(len[i]-jack_bin[jack_index][i])/(len[j]-jack_bin[jack_index][j])/Nz;
-                A_trs(i,j)=trkij;
-                A_trs(j,i)=trkij;
-
-        }
-  }
-
-
-X_l<<A_trs,b_trk,b_trk.transpose(),NC;
-Y_r<<c_yky,yy;
-
-/*if(jack_index==Njack){
-   cout<<X_l<<endl;
-   cout<<Y_r<<endl;
-}
-  */ 
-MatrixXdr herit=X_l.colPivHouseholderQr().solve(Y_r);
-
-
-if(jack_index==Njack){
-    cout<<"Xl"<<X_l<<endl;
-	cout<<"Yl"<<Y_r<<endl;
-
-     for(int i=0;i<(Nbin+1);i++)
-          point_est(i,0)=herit(i,0);
-}
-else{
-//if (jack_index==1)
-  // cout<<"Xl"<<X_l<<endl;
-for(int i=0;i<(Nbin+1);i++)
-      jack(i,jack_index)=herit(i,0);
-}
-
-/*double total_val=0;
-for(int i=0; i<Nbin;i++)
-    total_val+=herit(i,0);
-*/
-
-}//end of loop over jack
+genotype_stream_pass(name,1);
+genotype_stream_pass(name,2);
 
 
 double temp_sig=0;
 double temp_sum=0;
 
 std::ofstream outfile;
-string add_output=command_line_opts.OUTPUT_FILE_PATH;
-outfile.open(add_output.c_str(), std::ios_base::app);
+string add_output=command_line_opts.OUTPUT_PATH;
+outfile.open(add_output.c_str(), std::ios_base::out);
 
-cout<<endl<<"OUTPUT: "<<endl<<"Variances: "<<endl;
-outfile<<"OUTPUT: "<<endl<<"Variances: "<<endl;
-for (int j=0;j<Nbin;j++){
-        cout<<"Sigma^2_"<<j<<": "<<point_est(j,0)<<endl;
-	outfile<<"Sigma^2_"<<j<<": "<<point_est(j,0)<<endl;
-}
-cout<<"Sigma^2_e: "<<point_est(Nbin,0)<<endl;
-outfile<<"Sigma^2_e: "<<point_est(Nbin,0)<<endl;
 
 
 ///compute h^2s
 
+MatrixXdr Sigmas=point_est;
 
 temp_sum=point_est.sum();
 for (int j=0;j<Nbin;j++){
@@ -2178,6 +1971,8 @@ for (int j=0;j<Nbin;j++){
         temp_sig+=point_est(j,0);
 }
 point_est(Nbin,0)=temp_sig;
+
+MatrixXdr Sigmas_se=jack_se(jack);
 
 for (int i=0;i<Njack;i++){
    temp_sig=0;
@@ -2190,6 +1985,16 @@ for (int i=0;i<Njack;i++){
    //cout<<"jack"<<i<<" :"<<temp_sig<<endl;
 }
 ////
+
+//MatrixXdr Sigmas_se=jack_se(jack);
+cout<<endl<<"OUTPUT: "<<endl<<"Variances: "<<endl;
+outfile<<"OUTPUT: "<<endl<<"Variances: "<<endl;
+for (int j=0;j<Nbin;j++){
+        cout<<"Sigma^2_"<<j<<": "<<Sigmas(j,0)<<"  SE: "<<Sigmas_se(j,0)<<endl;
+        outfile<<"Sigma^2_"<<j<<": "<<Sigmas(j,0)<<" SE: "<<Sigmas_se(j,0)<<endl;
+}
+cout<<"Sigma^2_e: "<<Sigmas(Nbin,0)<<" SE: "<<Sigmas_se(Nbin,0)<<endl;
+outfile<<"Sigma^2_e: "<<Sigmas(Nbin,0)<<" SE: "<<Sigmas_se(Nbin,0)<<endl;
 
 
 
@@ -2210,16 +2015,12 @@ for(int i=0;i<Nbin;i++){
 }
 else{
 for(int i=0;i<Nbin;i++){
-    her_per_snp_inbin(i,0)=(double)jack(i,k)/len[i];
+    her_per_snp_inbin(i,0)=(double)jack(i,k)/(len[i]-jack_bin[k][i]);
 }
 
 }
-//MatrixXdr her_per_snp;
-//MatrixXdr her_cat_ldsc;
-//MatrixXdr point_her_cat_ldsc;
+
 her_per_snp=MatrixXdr::Zero(Nsnp,1);
-//her_cat_ldsc=MatrixXdr::Zero(Nbin,Njack);
-//point_her_cat_ldsc=MatrixXdr::Zero(Nbin,1);
 
 for(int i=0;i<Nsnp;i++){
    for(int j=0;j<Nbin;j++){
@@ -2248,42 +2049,9 @@ for(int i=0;i<Nsnp;i++){
 
 
 
-/*for(int i=0;i<Nsnp;i++){
-   for(int j=0;j<Nbin;j++){
-        int temp=i/step_size;
-        if (temp==Njack)
-             temp--;
-        if (annot_bool[i][j]==1){
-                her_cat_ldsc(j,temp)+=her_per_snp(i,0);
-//              her_cat_ldsc(j,Njack)+=her_per_snp(i,0);
-        }
-   }
-}
-*/
 
-//cout<<her_cat_ldsc<<endl;
-//MatrixXdr point_her_cat_ldsc=her_cat_ldsc.rowwise().sum();
-//cout<<point_her_cat_ldsc<<endl;
+MatrixXdr  se_her_cat_ldsc=jack_se(her_cat_ldsc);
 
-//for (int i=0;i<Nbin;i++)
- //   for(int j=0;j<Njack;j++)
-   //        her_cat_ldsc(i,j)=point_her_cat_ldsc(i,0)- her_cat_ldsc(i,j);
-
-
-
-//cout<<point_her_cat_ldsc<<endl;
-
-
-MatrixXdr se_her_cat_ldsc=jack_se(her_cat_ldsc);
-//cout<<se_her_cat_ldsc<<endl;
-
-/*cout<<endl<<"Heritabilities(overlap): "<<endl;
-outfile<<"Heritabilities(overlap): "<<endl;
-for (int j=0;j<Nbin;j++){
-     cout<<"overlap h^2 of bin "<<j<<" : "<<point_her_cat_ldsc(j,0)<<" ,  SE: "<<se_her_cat_ldsc(j,0)<<endl;
-     outfile<<"overlap h^2 of bin "<<j<<" : "<<point_her_cat_ldsc(j,0)<<" ,  SE: "<<se_her_cat_ldsc(j,0)<<endl;
-}
-*/
 
 cout<<endl<<"h^2's (heritabilities) and e's (enrichments) are computed based on Equation 9 (overlapping setting) in the paper  https://doi.org/10.1038/s41467-020-17576-9:"<<endl;
 outfile<<endl<<"h^2's (heritabilities) and e's (enrichments) are computed based on Equation 9 (overlapping setting) in the paper  https://doi.org/10.1038/s41467-020-17576-9:"<<endl;
@@ -2291,8 +2059,8 @@ outfile<<endl<<"h^2's (heritabilities) and e's (enrichments) are computed based 
 cout<<endl<<"h^2's: "<<endl;
 outfile<<"h^2's: "<<endl;
 for (int j=0;j<Nbin;j++){
-     cout<<"h^2 of bin "<<j<<" : "<<point_her_cat_ldsc(j,0)<<" ,  se: "<<se_her_cat_ldsc(j,0)<<endl;
-     outfile<<"h^2 of bin "<<j<<" : "<<point_her_cat_ldsc(j,0)<<" ,  se: "<<se_her_cat_ldsc(j,0)<<endl;
+     cout<<"h^2 of bin "<<j<<" : "<<point_her_cat_ldsc(j,0)<<" SE: "<<se_her_cat_ldsc(j,0)<<endl;
+     outfile<<"h^2 of bin "<<j<<" : "<<point_her_cat_ldsc(j,0)<<" SE: "<<se_her_cat_ldsc(j,0)<<endl;
 }
 
 
@@ -2309,20 +2077,12 @@ for(int i=0;i<Njack;i++)
 ////print prop of h2 
  se_her_cat_ldsc=jack_se(her_cat_ldsc);
 
-/*cout<<endl<<"Prop Heritabilities(overlap): "<<endl;
-outfile<<"Prop Heritabilities(overlap): "<<endl;
-for (int j=0;j<Nbin;j++){
-     cout<<"Prop overlap h^2 of bin "<<j<<" : "<<point_her_cat_ldsc(j,0)<<" ,  SE: "<<se_her_cat_ldsc(j,0)<<endl;
-     outfile<<"Prop overlap h^2 of bin "<<j<<" : "<<point_her_cat_ldsc(j,0)<<" ,  SE: "<<se_her_cat_ldsc(j,0)<<endl;
-}
-*/
-
 
 cout<<endl<<"h^2_i/h^2_t: "<<endl;
 outfile<<"h^2_i/h^2_t: "<<endl;
 for (int j=0;j<Nbin;j++){
-     cout<<"h^2/h^2_t of bin "<<j<<" : "<<point_her_cat_ldsc(j,0)<<",  se: "<<se_her_cat_ldsc(j,0)<<endl;
-     outfile<<"h^2/h^2_t of bin "<<j<<" : "<<point_her_cat_ldsc(j,0)<<",  se: "<<se_her_cat_ldsc(j,0)<<endl;
+     cout<<"h^2/h^2_t of bin "<<j<<" : "<<point_her_cat_ldsc(j,0)<<" SE: "<<se_her_cat_ldsc(j,0)<<endl;
+     outfile<<"h^2/h^2_t of bin "<<j<<" : "<<point_her_cat_ldsc(j,0)<<" SE: "<<se_her_cat_ldsc(j,0)<<endl;
 }
 
 
@@ -2330,8 +2090,8 @@ cout<<endl<<"Enrichments: "<<endl;
 outfile<<"Enrichments: "<<endl;
 for (int j=0;j<Nbin;j++){
         double snp_por=(double)len[j]/Nsnp;
-     cout<<"Enrichment of bin "<<j<<" : "<<point_her_cat_ldsc(j,0)/snp_por<<",  se: "<<se_her_cat_ldsc(j,0)/snp_por<<endl;
-     outfile<<"Enrichment of bin "<<j<<" : "<<point_her_cat_ldsc(j,0)/snp_por<<",  se: "<<se_her_cat_ldsc(j,0)/snp_por<<endl;
+     cout<<"Enrichment of bin "<<j<<" : "<<point_her_cat_ldsc(j,0)/snp_por<<" SE: "<<se_her_cat_ldsc(j,0)/snp_por<<endl;
+     outfile<<"Enrichment of bin "<<j<<" : "<<point_her_cat_ldsc(j,0)/snp_por<<" SE: "<<se_her_cat_ldsc(j,0)/snp_por<<endl;
 }
 
 
@@ -2394,86 +2154,27 @@ enrich_SEjack=jack_se(enrich_jack);
 
 
 
-/*
-////compute jackknife SE
-MatrixXdr sum_row=jack.rowwise().mean();
-MatrixXdr SEjack;
-SEjack=MatrixXdr::Zero(Nbin+1,1);
-double temp_val=0;
-for (int i=0;i<=Nbin;i++){
-    for (int j=0;j<Njack;j++){
-        temp_val=jack(i,j)-sum_row(i);
-        temp_val= temp_val* temp_val;
-        SEjack(i,0)+=temp_val;
-    }
-    SEjack(i,0)=SEjack(i,0)*(Njack-1)/Njack;
-    SEjack(i,0)=sqrt(SEjack(i,0));
-}
-///////// compute jackknife SE of enrichment
-MatrixXdr sum_row=enrich_jack.rowwise().mean();
-MatrixXdr enrich_SEjack;
-enrich_SEjack=MatrixXdr::Zero(Nbin,1);
- double temp_val=0;
-for (int i=0;i<Nbin;i++){
-    for (int j=0;j<Njack;j++){
-        temp_val=enrich_jack(i,j)-sum_row(i);
-        temp_val= temp_val* temp_val;
-        enrich_SEjack(i,0)+=temp_val;
-    }
-    enrich_SEjack(i,0)=enrich_SEjack(i,0)*(Njack-1)/Njack;
-    enrich_SEjack(i,0)=sqrt(enrich_SEjack(i,0));
-}
-*/
-
-/*
-cout<<endl<<"Heritabilities: "<<endl;
-outfile<<"Heritabilities: "<<endl;
-for (int j=0;j<Nbin;j++){
-     cout<<"h^2 of bin "<<j<<" : "<<point_est(j,0)<<" ,  SE: "<<SEjack(j,0)<<endl;
-     outfile<<"h^2 of bin "<<j<<" : "<<point_est(j,0)<<" ,  SE: "<<SEjack(j,0)<<endl;
-}
-cout<<"Total h^2 : "<<point_est(Nbin,0)<<" , SE: "<<SEjack(Nbin,0)<<endl;
-outfile<<"Total h^2 : "<<point_est(Nbin,0)<<" , SE: "<<SEjack(Nbin,0)<<endl;
-cout<<endl<<"Enrichments: "<<endl;
-outfile<<"Enrichments: "<<endl;
-for (int j=0;j<Nbin;j++){
-     cout<<"Enrichment of bin "<<j<<": "<<enrich_point_est(j,0)<<" ,  SE: "<<enrich_SEjack(j,0)<<endl;
-     outfile<<"Enrichment of bin "<<j<<": "<<enrich_point_est(j,0)<<" ,  SE: "<<enrich_SEjack(j,0)<<endl;
-}*/
-
 cout<<endl<<"h^2's (heritabilities) and e's (enrichments) are computed based on Equations 2-4 (non-overlapping setting) in the paper  https://doi.org/10.1038/s41467-020-17576-9:"<<endl;
 outfile<<endl<<"h^2's (heritabilities) and e's (enrichments) are computed based on Equations 2-4 (non-overlapping setting) in the paper  https://doi.org/10.1038/s41467-020-17576-9:"<<endl;
 
 cout<<endl<<"h^2's: "<<endl;
 outfile<<"h^2's: "<<endl;
 for (int j=0;j<Nbin;j++){
-     cout<<"h^2 of bin "<<j<<" : "<<point_est(j,0)<<",  se: "<<SEjack(j,0)<<endl;
-     outfile<<"h^2 of bin "<<j<<" : "<<point_est(j,0)<<",  se: "<<SEjack(j,0)<<endl;
+     cout<<"h^2 of bin "<<j<<" : "<<point_est(j,0)<<" SE: "<<SEjack(j,0)<<endl;
+     outfile<<"h^2 of bin "<<j<<" : "<<point_est(j,0)<<" SE: "<<SEjack(j,0)<<endl;
 }
-cout<<"Total h^2 : "<<point_est(Nbin,0)<<", se: "<<SEjack(Nbin,0)<<endl;
-outfile<<"Total h^2 : "<<point_est(Nbin,0)<<", se: "<<SEjack(Nbin,0)<<endl;
+cout<<"Total h^2 : "<<point_est(Nbin,0)<<" SE: "<<SEjack(Nbin,0)<<endl;
+outfile<<"Total h^2 : "<<point_est(Nbin,0)<<" SE: "<<SEjack(Nbin,0)<<endl;
 
 cout<<endl<<"Enrichments: "<<endl;
 outfile<<"Enrichments: "<<endl;
 for (int j=0;j<Nbin;j++){
-     cout<<"Enrichment of bin "<<j<<": "<<enrich_point_est(j,0)<<" ,  se: "<<enrich_SEjack(j,0)<<endl;
-     outfile<<"Enrichment of bin "<<j<<": "<<enrich_point_est(j,0)<<" ,  se: "<<enrich_SEjack(j,0)<<endl;
+     cout<<"Enrichment of bin "<<j<<": "<<enrich_point_est(j,0)<<" SE: "<<enrich_SEjack(j,0)<<endl;
+     outfile<<"Enrichment of bin "<<j<<": "<<enrich_point_est(j,0)<<" SE: "<<enrich_SEjack(j,0)<<endl;
 }
 
 
-/*std::ofstream outfile;
-string add_output=command_line_opts.OUTPUT_FILE_PATH;
-outfile.open(add_output.c_str(), std::ios_base::app);
+////////////////////////////////////////////////////////
 
-outfile<<"Point estimates: "<<endl;
-outfile<<point_est.transpose()<<endl;
-outfile<<"SEs     :"<<endl;
-outfile<<SEjack.transpose()<<endl;
-
-outfile<<"Enrichment: "<<endl;
-outfile<<enrich_point_est.transpose()<<endl;
-outfile<<"SEs     :"<<endl;
-outfile<<enrich_SEjack.transpose()<<endl;
-*/
 	return 0;
 }
