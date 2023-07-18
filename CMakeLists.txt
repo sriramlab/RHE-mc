@@ -17,4 +17,5 @@ ADD_DEFINITIONS(-DDEBUG=${DEBUG})
 
 add_executable(RHEmc src/RHEmc.cpp src/genotype.cpp src/storage.cpp)
 add_executable(RHEmc_mem src/rhemc_mem_eff.cpp src/genotype.cpp src/storage.cpp)
+add_executable(RHEmc_mp src/multi.phen.rhemc.cpp src/genotype.cpp src/storage.cpp)
 add_executable(RHEmc_dom src/rhemc_dom.cpp src/genotype.cpp src/storage.cpp)
