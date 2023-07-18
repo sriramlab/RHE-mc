@@ -13,7 +13,6 @@ using namespace std;
 struct options{
 
 	std::string GENOTYPE_FILE_PATH;
-	std::string OUTPUT_FILE_PATH;
 	std::string PHENOTYPE_FILE_PATH; 
 	std::string COVARIATE_FILE_PATH; 
 	std::string COVARIATE_NAME; 
