@@ -1,3 +1,10 @@
+
+# Deprecation
+
+RHE-mc is no longer actively maintained. Please switch to GENIE, which estimates additive, GxE, or both types of heritability. You can download GENIE here: https://github.com/sriramlab/GENIE/.
+
+
+
 # RHE-mc
 Randomized Haseman–Elston regression for Multi-variance Components
 
